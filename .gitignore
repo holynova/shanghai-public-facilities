@@ -11,3 +11,4 @@ outputs/
 *.log
 .DS_Store
 .playwright-cli/
+output/

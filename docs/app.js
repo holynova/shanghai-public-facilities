@@ -7,6 +7,7 @@ const button = form.querySelector("button");
 const categoryNav = document.querySelector("#category-nav");
 const searchHistory = document.querySelector("#search-history");
 const historyItems = document.querySelector("#history-items");
+const currentLocationButton = document.querySelector("#current-location");
 const HISTORY_STORAGE_KEY = "shanghai-place-search-history";
 const HISTORY_LIMIT = 5;
 
@@ -37,6 +38,21 @@ historyItems.addEventListener("click", (event) => {
   const address = target.dataset.address;
   addressInput.value = address;
   searchNearby(address);
+});
+
+currentLocationButton.addEventListener("click", async () => {
+  setLocationLoading(true);
+  setLoading(true);
+  try {
+    await catalogueReady;
+    const origin = await getCurrentLocation();
+    renderPlaces({ origin, groups: findNearestByCategory(facilities, origin) });
+  } catch (error) {
+    renderMessage(error instanceof Error ? error.message : "无法获取当前位置。", "error");
+  } finally {
+    setLoading(false);
+    setLocationLoading(false);
+  }
 });
 
 categoryNav.addEventListener("click", (event) => {
@@ -77,6 +93,11 @@ function setLoading(loading) {
   }
 }
 
+function setLocationLoading(loading) {
+  currentLocationButton.disabled = loading;
+  currentLocationButton.querySelector("span").textContent = loading ? "正在定位" : "使用当前位置";
+}
+
 function geocodeAddress(address) {
   return loadAmap().then(() => new Promise((resolve, reject) => {
     let settled = false;
@@ -99,6 +120,23 @@ function geocodeAddress(address) {
         formattedAddress: place.formattedAddress || address,
         latitude: Number(place.location.lat),
         longitude: Number(place.location.lng),
+      });
+    });
+  }));
+}
+
+function getCurrentLocation() {
+  return loadAmapPlugin("AMap.Geolocation", "Geolocation").then(() => new Promise((resolve, reject) => {
+    const geolocation = new window.AMap.Geolocation({ enableHighAccuracy: true, timeout: 10_000, convert: true });
+    geolocation.getCurrentPosition((status, result) => {
+      if (status !== "complete" || !result?.position) {
+        reject(new Error("定位失败，请允许浏览器访问位置后重试。"));
+        return;
+      }
+      resolve({
+        formattedAddress: result.formattedAddress || "当前位置",
+        latitude: Number(result.position.lat),
+        longitude: Number(result.position.lng),
       });
     });
   }));
@@ -137,6 +175,15 @@ function loadAmap() {
   return amapReady;
 }
 
+function loadAmapPlugin(pluginName, className) {
+  return loadAmap().then(() => {
+    if (window.AMap?.[className]) return undefined;
+    return new Promise((resolve, reject) => {
+      window.AMap.plugin(pluginName, () => window.AMap?.[className] ? resolve() : reject(new Error("高德定位插件初始化失败。")));
+    });
+  });
+}
+
 function findNearestByCategory(catalogue, origin) {
   const groups = new Map();
   for (const facility of catalogue) {
@@ -171,11 +218,11 @@ function haversineMeters(first, second) {
 
 function renderPlaces(payload) {
   const { origin, groups } = payload;
-  status.textContent = `${origin.formattedAddress} · ${formatCoordinate(origin.latitude, origin.longitude)}`;
+  status.textContent = origin.formattedAddress;
   categoryNav.hidden = false;
   categoryNav.innerHTML = groups.map((group) => {
     const meta = categoryMeta(group.category);
-    return `<button type="button" data-target="${groupId(group.category)}" style="--route:${meta.color}"><i></i><span>${meta.label}</span></button>`;
+    return `<button type="button" data-target="${groupId(group.category)}" style="--route:${meta.color}" aria-label="${escapeHtml(meta.label)}" title="${escapeHtml(meta.label)}"><i></i><span>${escapeHtml(meta.shortLabel)}</span></button>`;
   }).join("");
   resultContent.className = "place-list";
   resultContent.innerHTML = groups.map((group) => {
@@ -227,9 +274,9 @@ function categorySortOrder(category) {
 
 function categoryMeta(category) {
   const categories = {
-    "culture.art_gallery": { label: "美术馆", color: "#e54b3f" }, "culture.concert_hall": { label: "音乐厅", color: "#9a4f9e" }, "culture.museum": { label: "博物馆", color: "#ce3347" }, "commerce.big_box_retail": { label: "大型仓储零售", color: "#c78c00" }, "commerce.large_mall": { label: "大型商场", color: "#de6a18" }, "community.civic_service_center": { label: "社区文化与党群服务中心", color: "#00888f" }, "landmark.city_landmark": { label: "上海地标", color: "#715bba" }, "library.all": { label: "图书馆", color: "#3474b9" }, "medical.tertiary_a": { label: "三级甲等医院", color: "#bd2d45" }, "medical.other": { label: "其他医疗机构", color: "#de6a79" }, "park.major_city_park": { label: "大型市级公园", color: "#23834d" }, "park.neighborhood_park": { label: "街区与口袋公园", color: "#68a52b" }, "transit.metro_station": { label: "地铁站", color: "#009a74" }, "transport.airport": { label: "机场", color: "#3c87b9" }, "transport.railway_station": { label: "火车站", color: "#df831e" },
+    "culture.art_gallery": { label: "美术馆", shortLabel: "美术馆", color: "#e54b3f" }, "culture.concert_hall": { label: "音乐厅", shortLabel: "音乐厅", color: "#9a4f9e" }, "culture.museum": { label: "博物馆", shortLabel: "博物馆", color: "#ce3347" }, "commerce.big_box_retail": { label: "大型仓储零售", shortLabel: "仓储零售", color: "#c78c00" }, "commerce.large_mall": { label: "大型商场", shortLabel: "大型商场", color: "#de6a18" }, "community.civic_service_center": { label: "社区文化与党群服务中心", shortLabel: "社区中心", color: "#00888f" }, "landmark.city_landmark": { label: "上海地标", shortLabel: "上海地标", color: "#715bba" }, "library.all": { label: "图书馆", shortLabel: "图书馆", color: "#3474b9" }, "medical.tertiary_a": { label: "三级甲等医院", shortLabel: "三甲医院", color: "#bd2d45" }, "medical.other": { label: "其他医疗机构", shortLabel: "其他医疗", color: "#de6a79" }, "park.major_city_park": { label: "大型市级公园", shortLabel: "市级公园", color: "#23834d" }, "park.neighborhood_park": { label: "街区与口袋公园", shortLabel: "口袋公园", color: "#68a52b" }, "transit.metro_station": { label: "地铁站", shortLabel: "地铁站", color: "#009a74" }, "transport.airport": { label: "机场", shortLabel: "机场", color: "#3c87b9" }, "transport.railway_station": { label: "火车站", shortLabel: "火车站", color: "#df831e" },
   };
-  return categories[category] || { label: category, color: "#617077" };
+  return categories[category] || { label: category, shortLabel: category, color: "#617077" };
 }
 
 function formatDistance(meters) { return meters < 1000 ? `${meters} m` : `${(meters / 1000).toFixed(1)} km`; }
