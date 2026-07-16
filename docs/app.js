@@ -9,11 +9,21 @@ const scoreContent = document.querySelector("#score-content");
 const searchHistory = document.querySelector("#search-history");
 const historyItems = document.querySelector("#history-items");
 const currentLocationButton = document.querySelector("#current-location");
+const shareDialog = document.querySelector("#share-dialog");
+const shareCloseButton = document.querySelector("#share-close");
+const nativeShareButton = document.querySelector("#native-share");
+const copyShareButton = document.querySelector("#copy-share");
+const shareAddress = document.querySelector("#share-address");
+const shareScore = document.querySelector("#share-score");
+const shareQr = document.querySelector("#share-qr");
+const shareLink = document.querySelector("#share-link");
+const shareFeedback = document.querySelector("#share-feedback");
 const HISTORY_STORAGE_KEY = "shanghai-place-search-history";
 const HISTORY_LIMIT = 5;
 
 let facilities = [];
 let amapReady;
+let latestShare;
 
 const catalogueReady = fetch("data/facilities.json")
   .then((response) => {
@@ -61,6 +71,18 @@ categoryNav.addEventListener("click", (event) => {
   if (!target) return;
   document.querySelector(`#${target.dataset.target}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
+
+scoreContent.addEventListener("click", (event) => {
+  if (!event.target.closest("#open-share")) return;
+  openShareDialog();
+});
+
+shareCloseButton.addEventListener("click", () => shareDialog.close());
+shareDialog.addEventListener("click", (event) => {
+  if (event.target === shareDialog) shareDialog.close();
+});
+nativeShareButton.addEventListener("click", shareCurrentResult);
+copyShareButton.addEventListener("click", copyProjectLink);
 
 async function searchNearby(address) {
   if (address.length < 2) {
@@ -222,6 +244,7 @@ function haversineMeters(first, second) {
 function renderPlaces(payload) {
   const { origin, groups } = payload;
   const score = calculateConvenienceScore(groups);
+  latestShare = { address: origin.formattedAddress, score: score.total };
   status.textContent = origin.formattedAddress;
   scoreContent.hidden = false;
   scoreContent.innerHTML = renderScoreSummary(score);
@@ -257,7 +280,48 @@ function proximityScore(places, maximumDistance) {
 }
 
 function renderScoreSummary(score) {
-  return `<section class="score-summary" aria-label="综合便利度评分"><div class="score-total"><span>综合便利度</span><strong>${score.total}<small>/ 100</small></strong></div><div class="score-breakdown">${score.dimensions.map((dimension) => `<div><span>${escapeHtml(dimension.label)}</span><strong>${dimension.value} / ${dimension.maximum}</strong></div>`).join("")}</div><p>按每类最近三处地点的直线距离加权估算，适合作为初步比较。</p></section>`;
+  return `<section class="score-summary" aria-label="综合便利度评分"><div class="score-total"><span>综合便利度</span><strong>${score.total}<small>/ 100</small></strong><button id="open-share" class="share-trigger" type="button">分享</button></div><div class="score-breakdown">${score.dimensions.map((dimension) => `<div><span>${escapeHtml(dimension.label)}</span><strong>${dimension.value} / ${dimension.maximum}</strong></div>`).join("")}</div><p>按每类最近三处地点的直线距离加权估算，适合作为初步比较。</p></section>`;
+}
+
+function projectUrl() { return new URL("./", window.location.href).href; }
+
+function shareText() {
+  return `${latestShare.address}附近设施：综合便利度 ${latestShare.score}/100。`;
+}
+
+function openShareDialog() {
+  if (!latestShare) return;
+  const url = projectUrl();
+  shareAddress.textContent = latestShare.address;
+  shareScore.textContent = latestShare.score;
+  shareLink.href = url;
+  shareLink.textContent = url.replace(/^https?:\/\//, "");
+  shareQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=8&data=${encodeURIComponent(url)}`;
+  shareFeedback.textContent = "";
+  shareDialog.showModal();
+}
+
+async function shareCurrentResult() {
+  if (!latestShare) return;
+  if (!navigator.share) {
+    await copyProjectLink();
+    return;
+  }
+  try {
+    await navigator.share({ title: "近邻｜上海公共设施", text: shareText(), url: projectUrl() });
+    shareFeedback.textContent = "已打开系统分享。";
+  } catch (error) {
+    if (error?.name !== "AbortError") shareFeedback.textContent = "系统分享暂不可用，可复制项目链接。";
+  }
+}
+
+async function copyProjectLink() {
+  try {
+    await navigator.clipboard.writeText(projectUrl());
+    shareFeedback.textContent = "项目链接已复制。";
+  } catch {
+    shareFeedback.textContent = "复制失败，请长按链接手动复制。";
+  }
 }
 
 function renderAlternateNames(place) {
