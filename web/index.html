@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#10232e" />
+    <title>近邻 | 上海地点换乘检索</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="近邻首页"><span class="brand-seal">近</span><span>近邻</span></a>
+      <a class="repo-link" href="https://github.com/holynova/shanghai-public-facilities" target="_blank" rel="noreferrer">GitHub</a>
+    </header>
+
+    <main>
+      <section class="search-deck" aria-labelledby="page-title">
+        <div class="search-copy">
+          <h1 id="page-title">找附近</h1>
+          <p>输入上海地址，查看每类最近地点。</p>
+        </div>
+        <form id="address-form" class="address-form" novalidate>
+          <label for="address">上海地址</label>
+          <div class="input-row">
+            <input id="address" name="address" autocomplete="street-address" placeholder="街道、门牌号或地标" maxlength="200" required />
+            <button type="submit" aria-label="开始查询">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"></circle><path d="m15 15 4.5 4.5"></path></svg>
+            </button>
+          </div>
+        </form>
+        <div id="search-history" class="search-history" hidden>
+          <p>最近搜索</p>
+          <div id="history-items" class="history-items"></div>
+        </div>
+      </section>
+
+      <section class="results" id="results" aria-live="polite" aria-busy="false">
+        <div class="result-bar">
+          <div>
+            <h2>最近地点</h2>
+          </div>
+          <p id="status">输入地址后开始检索</p>
+        </div>
+        <div class="results-layout">
+          <nav id="category-nav" class="category-nav" aria-label="结果类别导航" hidden></nav>
+          <div id="result-content" class="empty-state">
+            <h3>输入地址开始查找</h3>
+            <p>每个类别显示最近三处地点。</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>距离为直线距离，仅供出行初筛</footer>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

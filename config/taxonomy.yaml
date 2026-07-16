@@ -1,0 +1,22 @@
+categories:
+  - culture.museum
+  - culture.art_gallery
+  - library.municipal
+  - library.district
+  - library.subdistrict_town
+  - library.branch
+  - transit.metro_station
+  - hospital.tertiary_a
+  - hospital.secondary_a
+  - primary_care.community_center
+  - primary_care.community_subcenter
+  - primary_care.community_station
+  - commerce.big_box_retail
+  - commerce.large_mall
+  - transport.railway_station
+  - transport.airport
+  - landmark.city_landmark
+  - culture.concert_hall
+  - park.major_city_park
+  - park.neighborhood_park
+  - community.civic_service_center

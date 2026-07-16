@@ -1,0 +1,11 @@
+baseUrl: https://restapi.amap.com
+concurrency: 2
+minimumRequestIntervalMs: 1100
+pageSize: 25
+maxPagesPerQuery: 100
+maxRetries: 4
+retryDelaysMs:
+  - 1000
+  - 2000
+  - 4000
+  - 8000

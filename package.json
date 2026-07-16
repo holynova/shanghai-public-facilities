@@ -1,0 +1,36 @@
+{
+  "name": "shanghai-public-facilities",
+  "version": "0.1.0",
+  "description": "上海公共地点近邻检索",
+  "private": true,
+  "homepage": "https://holynova.github.io/shanghai-public-facilities/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holynova/shanghai-public-facilities.git"
+  },
+  "bugs": {
+    "url": "https://github.com/holynova/shanghai-public-facilities/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0 <23"
+  },
+  "scripts": {
+    "build": "tsc",
+    "cli": "npm run build --silent && node dist/cli.js",
+    "web": "npm run build --silent && node dist/web/server.js",
+    "check:env": "npm run build --silent && node dist/cli.js check-env",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "dotenv": "^16.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
