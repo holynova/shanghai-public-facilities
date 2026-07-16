@@ -19,15 +19,17 @@
           <h1 id="page-title">找附近</h1>
           <p>输入上海地址，查看每类最近地点。</p>
         </div>
-        <form id="address-form" class="address-form" novalidate>
-          <label for="address">上海地址</label>
-          <div class="input-row">
-            <input id="address" name="address" autocomplete="street-address" placeholder="例如：人民公园" maxlength="200" required />
-            <button type="submit" aria-label="开始查询">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"></circle><path d="m15 15 4.5 4.5"></path></svg>
-            </button>
-          </div>
-        </form>
+      </section>
+      <form id="address-form" class="address-form" novalidate>
+        <label for="address">上海地址</label>
+        <div class="input-row">
+          <input id="address" name="address" autocomplete="street-address" placeholder="例如：人民公园" maxlength="200" required />
+          <button type="submit" aria-label="开始查询">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"></circle><path d="m15 15 4.5 4.5"></path></svg>
+          </button>
+        </div>
+      </form>
+      <section class="search-extras" aria-label="快速定位与搜索历史">
         <button id="current-location" class="location-action" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-4.2 6-10a6 6 0 1 0-12 0c0 5.8 6 10 6 10Z"></path><circle cx="12" cy="11" r="2"></circle></svg>
           <span>使用当前位置</span>
@@ -44,6 +46,7 @@
           <p id="status">正在加载上海地点目录</p>
         </div>
         <div class="results-layout">
+          <div id="score-content" hidden></div>
           <nav id="category-nav" class="category-nav" aria-label="结果类别导航" hidden></nav>
           <div id="result-content" class="empty-state">
             <h3>加载地点目录中</h3>

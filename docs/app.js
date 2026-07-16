@@ -5,6 +5,7 @@ const status = document.querySelector("#status");
 const results = document.querySelector("#results");
 const button = form.querySelector("button");
 const categoryNav = document.querySelector("#category-nav");
+const scoreContent = document.querySelector("#score-content");
 const searchHistory = document.querySelector("#search-history");
 const historyItems = document.querySelector("#history-items");
 const currentLocationButton = document.querySelector("#current-location");
@@ -88,6 +89,8 @@ function setLoading(loading) {
   if (loading) {
     status.textContent = "正在定位并计算各类别最近地点";
     categoryNav.hidden = true;
+    scoreContent.hidden = true;
+    scoreContent.innerHTML = "";
     resultContent.className = "loading-state";
     resultContent.innerHTML = "<span></span><span></span><span></span><p>正在查询高德地图</p>";
   }
@@ -218,7 +221,10 @@ function haversineMeters(first, second) {
 
 function renderPlaces(payload) {
   const { origin, groups } = payload;
+  const score = calculateConvenienceScore(groups);
   status.textContent = origin.formattedAddress;
+  scoreContent.hidden = false;
+  scoreContent.innerHTML = renderScoreSummary(score);
   categoryNav.hidden = false;
   categoryNav.innerHTML = groups.map((group) => {
     const meta = categoryMeta(group.category);
@@ -231,6 +237,29 @@ function renderPlaces(payload) {
   }).join("");
 }
 
+function calculateConvenienceScore(groups) {
+  const byCategory = new Map(groups.map((group) => [group.category, group.places]));
+  const categoryScore = (category, maximumDistance) => proximityScore(byCategory.get(category) || [], maximumDistance);
+  const dimensions = [
+    { label: "交通", maximum: 30, score: 22 * categoryScore("transit.metro_station", 2_000) + 6 * categoryScore("transport.railway_station", 8_000) + 2 * categoryScore("transport.airport", 30_000) },
+    { label: "医疗", maximum: 20, score: 12 * categoryScore("medical.tertiary_a", 5_000) + 8 * categoryScore("medical.other", 2_500) },
+    { label: "公共服务", maximum: 20, score: 12 * categoryScore("community.civic_service_center", 2_000) + 8 * categoryScore("library.all", 2_500) },
+    { label: "文化艺术", maximum: 15, score: 7 * categoryScore("culture.museum", 4_000) + 4 * categoryScore("culture.art_gallery", 4_000) + 4 * categoryScore("culture.concert_hall", 4_000) },
+    { label: "生活商业", maximum: 10, score: 4 * categoryScore("commerce.big_box_retail", 5_000) + 6 * categoryScore("commerce.large_mall", 5_000) },
+    { label: "绿地休闲", maximum: 5, score: 3 * categoryScore("park.major_city_park", 6_000) + 2 * categoryScore("park.neighborhood_park", 2_000) },
+  ].map((dimension) => ({ ...dimension, value: Math.round(dimension.score) }));
+  return { total: dimensions.reduce((sum, dimension) => sum + dimension.value, 0), dimensions };
+}
+
+function proximityScore(places, maximumDistance) {
+  const rankWeights = [0.6, 0.25, 0.15];
+  return places.reduce((sum, place, index) => sum + (rankWeights[index] || 0) * Math.max(0, 1 - place.distanceMeters / maximumDistance), 0);
+}
+
+function renderScoreSummary(score) {
+  return `<section class="score-summary" aria-label="综合便利度评分"><div class="score-total"><span>综合便利度</span><strong>${score.total}<small>/ 100</small></strong></div><div class="score-breakdown">${score.dimensions.map((dimension) => `<div><span>${escapeHtml(dimension.label)}</span><strong>${dimension.value} / ${dimension.maximum}</strong></div>`).join("")}</div><p>按每类最近三处地点的直线距离加权估算，适合作为初步比较。</p></section>`;
+}
+
 function renderAlternateNames(place) {
   const alternateNames = (place.alternateNames || []).filter((name) => name !== place.name);
   return alternateNames.length ? `<p class="merged-names">同址/近邻服务点 · ${escapeHtml(alternateNames.join(" · "))}</p>` : "";
@@ -238,6 +267,8 @@ function renderAlternateNames(place) {
 
 function renderMessage(message, type) {
   categoryNav.hidden = true;
+  scoreContent.hidden = true;
+  scoreContent.innerHTML = "";
   status.textContent = type === "error" ? "无法完成定位" : "输入地址后开始检索";
   resultContent.className = `empty-state ${type}`;
   resultContent.innerHTML = `<h3>${escapeHtml(message)}</h3><p>请补充区、路名或门牌号后重试。</p>`;
@@ -269,7 +300,7 @@ function displayCategoryFor(category) {
 }
 
 function categorySortOrder(category) {
-  return ["culture.museum", "culture.art_gallery", "culture.concert_hall", "library.all", "community.civic_service_center", "transit.metro_station", "transport.railway_station", "transport.airport", "park.major_city_park", "park.neighborhood_park", "medical.tertiary_a", "medical.other", "commerce.big_box_retail", "commerce.large_mall", "landmark.city_landmark"].indexOf(category);
+  return ["transit.metro_station", "transport.railway_station", "transport.airport", "medical.tertiary_a", "medical.other", "community.civic_service_center", "library.all", "culture.museum", "culture.art_gallery", "culture.concert_hall", "park.major_city_park", "park.neighborhood_park", "commerce.big_box_retail", "commerce.large_mall", "landmark.city_landmark"].indexOf(category);
 }
 
 function categoryMeta(category) {
