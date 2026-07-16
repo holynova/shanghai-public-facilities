@@ -264,24 +264,24 @@ function renderPlaces(payload) {
 function calculateConvenienceScore(groups) {
   const byCategory = new Map(groups.map((group) => [group.category, group.places]));
   const categoryScore = (category, maximumDistance) => proximityScore(byCategory.get(category) || [], maximumDistance);
+  const groupScore = (categories) => categories.reduce((sum, [category, maximumDistance]) => sum + categoryScore(category, maximumDistance), 0) / categories.length;
   const dimensions = [
-    { label: "交通", maximum: 30, score: 22 * categoryScore("transit.metro_station", 2_000) + 6 * categoryScore("transport.railway_station", 8_000) + 2 * categoryScore("transport.airport", 30_000) },
-    { label: "医疗", maximum: 20, score: 12 * categoryScore("medical.tertiary_a", 5_000) + 8 * categoryScore("medical.other", 2_500) },
-    { label: "公共服务", maximum: 20, score: 12 * categoryScore("community.civic_service_center", 2_000) + 8 * categoryScore("library.all", 2_500) },
-    { label: "文化艺术", maximum: 15, score: 7 * categoryScore("culture.museum", 4_000) + 4 * categoryScore("culture.art_gallery", 4_000) + 4 * categoryScore("culture.concert_hall", 4_000) },
-    { label: "生活商业", maximum: 10, score: 4 * categoryScore("commerce.big_box_retail", 5_000) + 6 * categoryScore("commerce.large_mall", 5_000) },
-    { label: "绿地休闲", maximum: 5, score: 3 * categoryScore("park.major_city_park", 6_000) + 2 * categoryScore("park.neighborhood_park", 2_000) },
-  ].map((dimension) => ({ ...dimension, value: Math.round(dimension.score) }));
-  return { total: dimensions.reduce((sum, dimension) => sum + dimension.value, 0), dimensions };
+    { label: "交通", score: groupScore([["transit.metro_station", 2_000], ["transport.railway_station", 8_000], ["transport.airport", 30_000]]) },
+    { label: "医疗", score: groupScore([["medical.tertiary_a", 5_000], ["medical.other", 2_500]]) },
+    { label: "公共文化", score: groupScore([["community.civic_service_center", 2_000], ["library.all", 2_500], ["culture.museum", 4_000], ["culture.art_gallery", 4_000], ["culture.concert_hall", 4_000]]) },
+    { label: "生活商业", score: groupScore([["commerce.big_box_retail", 5_000], ["commerce.large_mall", 5_000]]) },
+    { label: "绿地休闲", score: groupScore([["park.major_city_park", 6_000], ["park.neighborhood_park", 2_000]]) },
+  ].map((dimension) => ({ ...dimension, maximum: 100, score: dimension.score * 100, value: Math.round(dimension.score * 100) }));
+  return { total: Math.round(dimensions.reduce((sum, dimension) => sum + dimension.score, 0) / dimensions.length), dimensions };
 }
 
 function proximityScore(places, maximumDistance) {
-  const rankWeights = [0.6, 0.25, 0.15];
-  return places.reduce((sum, place, index) => sum + (rankWeights[index] || 0) * Math.max(0, 1 - place.distanceMeters / maximumDistance), 0);
+  if (places.length === 0) return 0;
+  return places.reduce((sum, place) => sum + Math.max(0, 1 - place.distanceMeters / maximumDistance), 0) / places.length;
 }
 
 function renderScoreSummary(score) {
-  return `<section class="score-summary" aria-label="综合便利度评分"><div class="score-total"><span>综合便利度</span><strong>${score.total}<small>/ 100</small></strong><button id="open-share" class="share-trigger" type="button">分享</button></div><div class="score-breakdown">${score.dimensions.map((dimension) => `<div><span>${escapeHtml(dimension.label)}</span><strong>${dimension.value} / ${dimension.maximum}</strong></div>`).join("")}</div><p>按每类最近三处地点的直线距离加权估算，适合作为初步比较。</p></section>`;
+  return `<section class="score-summary" aria-label="综合便利度评分"><div class="score-total"><span>综合便利度</span><strong>${score.total}<small>/ 100</small></strong><button id="open-share" class="share-trigger" type="button">分享</button></div><div class="score-breakdown">${score.dimensions.map((dimension) => `<div><span>${escapeHtml(dimension.label)}</span><strong>${dimension.value} / ${dimension.maximum}</strong></div>`).join("")}</div><p>每组均为 100 分；组内设施和各组均等权，综合分为五组平均。</p></section>`;
 }
 
 function projectUrl() { return new URL("./", window.location.href).href; }
