@@ -6,15 +6,20 @@
     <title>近邻 | 上海公共地点检索</title>
     <style>
       :root { color:#17242a; background:#f4f6f5; font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC",sans-serif; }
-      body { width:min(100% - 36px,390px); margin:0 auto; padding:32px 0; }
-      h1 { margin:0; font-size:32px; } p { color:#53636a; font-size:16px; line-height:1.65; } img { display:block; width:100%; margin:24px 0; border:1px solid #d3dcda; } a { color:#10232e; font-weight:700; }
+      body { width:min(100% - 36px,560px); margin:0 auto; padding:48px 0; }
+      h1 { margin:0; color:#10232e; font-size:34px; } p { color:#53636a; font-size:16px; line-height:1.7; } a { color:#10232e; font-weight:700; }
+      .mark { display:grid; width:30px; height:30px; margin-bottom:20px; place-items:center; color:#10232e; background:#f2c400; font-weight:700; }
+      .links { display:flex; flex-wrap:wrap; gap:14px; margin-top:28px; }
     </style>
   </head>
   <body>
+    <div class="mark">近</div>
     <h1>近邻</h1>
-    <p>上海公共地点近邻检索。</p>
-    <img src="screenshot.png" alt="近邻移动端页面截图" />
+    <p>上海公共地点近邻检索，按文化、交通、医疗、商业与社区服务等类别展示最近地点。</p>
     <p>完整地址查询需要部署 Node 服务与私有的高德服务端 Key。</p>
-    <p><a href="https://github.com/holynova/shanghai-public-facilities">查看 GitHub 仓库</a></p>
+    <div class="links">
+      <a href="https://github.com/holynova/shanghai-public-facilities">GitHub 仓库</a>
+      <a href="https://github.com/holynova/shanghai-public-facilities#readme">查看项目截图</a>
+    </div>
   </body>
 </html>
