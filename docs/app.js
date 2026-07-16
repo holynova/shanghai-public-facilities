@@ -15,6 +15,7 @@ const nativeShareButton = document.querySelector("#native-share");
 const copyShareButton = document.querySelector("#copy-share");
 const shareAddress = document.querySelector("#share-address");
 const shareScore = document.querySelector("#share-score");
+const shareDimensions = document.querySelector("#share-dimensions");
 const shareQr = document.querySelector("#share-qr");
 const shareLink = document.querySelector("#share-link");
 const shareFeedback = document.querySelector("#share-feedback");
@@ -244,7 +245,7 @@ function haversineMeters(first, second) {
 function renderPlaces(payload) {
   const { origin, groups } = payload;
   const score = calculateConvenienceScore(groups);
-  latestShare = { address: origin.formattedAddress, score: score.total };
+  latestShare = { address: origin.formattedAddress, score: score.total, dimensions: score.dimensions };
   status.textContent = origin.formattedAddress;
   scoreContent.hidden = false;
   scoreContent.innerHTML = renderScoreSummary(score);
@@ -294,6 +295,7 @@ function openShareDialog() {
   const url = projectUrl();
   shareAddress.textContent = latestShare.address;
   shareScore.textContent = latestShare.score;
+  shareDimensions.innerHTML = latestShare.dimensions.map((dimension) => `<span>${escapeHtml(dimension.label)} ${dimension.value}/${dimension.maximum}</span>`).join("");
   shareLink.href = url;
   shareLink.textContent = url.replace(/^https?:\/\//, "");
   shareQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=8&data=${encodeURIComponent(url)}`;
