@@ -79,9 +79,6 @@ currentLocationButton.addEventListener("click", async () => {
   try {
     await catalogueReady;
     const origin = await getCurrentLocation();
-    if (!origin.formattedAddress.includes(CITIES[activeCity].name)) {
-      throw new Error(`当前位置不在${CITIES[activeCity].name}，请切换城市后重试。`);
-    }
     renderPlaces({ origin, groups: findNearestByCategory(facilities, origin) });
   } catch (error) {
     renderMessage(error instanceof Error ? error.message : "无法获取当前位置。", "error");
