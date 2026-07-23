@@ -299,7 +299,7 @@ function renderPlaces(payload) {
   resultContent.className = "place-list";
   resultContent.innerHTML = groups.map((group) => {
     const meta = categoryMeta(group.category);
-    return `<section class="category-group" id="${groupId(group.category)}" style="--route:${meta.color}" aria-label="${escapeHtml(meta.label)}"><header class="category-heading"><p>${escapeHtml(meta.label)}</p></header>${group.places.map((place) => `<article class="place"><div class="place-main"><h3>${escapeHtml(place.name)}</h3>${renderAlternateNames(place)}${place.metroLines?.length ? `<p class="metro-lines">${escapeHtml(place.metroLines.join(" · "))}</p>` : ""}<p class="address">${escapeHtml(place.district || "上海")}${place.address ? " · " + escapeHtml(place.address) : ""}</p></div><div class="distance"><strong>${formatDistance(place.distanceMeters)}</strong><span>直线距离</span></div></article>`).join("")}</section>`;
+    return `<section class="category-group" id="${groupId(group.category)}" style="--route:${meta.color}" aria-label="${escapeHtml(meta.label)}"><header class="category-heading"><p>${escapeHtml(meta.label)}</p></header>${group.places.map((place) => `<article class="place"><div class="place-main"><h3>${escapeHtml(place.name)}</h3>${renderAlternateNames(place)}${place.metroLines?.length ? `<p class="metro-lines">${escapeHtml(place.metroLines.join(" · "))}</p>` : ""}<p class="address">${escapeHtml(place.district || CITIES[activeCity].name)}${place.address ? " · " + escapeHtml(place.address) : ""}</p></div><div class="distance"><strong>${formatDistance(place.distanceMeters)}</strong><span>直线距离</span></div></article>`).join("")}</section>`;
   }).join("");
 }
 
