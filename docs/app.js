@@ -5,7 +5,7 @@ const status = document.querySelector("#status");
 const results = document.querySelector("#results");
 const button = form.querySelector("button");
 const categoryNav = document.querySelector("#category-nav");
-const scoreContent = document.querySelector("#score-content");
+const shareButton = document.querySelector("#open-share");
 const searchHistory = document.querySelector("#search-history");
 const historyItems = document.querySelector("#history-items");
 const currentLocationButton = document.querySelector("#current-location");
@@ -17,8 +17,6 @@ const shareCloseButton = document.querySelector("#share-close");
 const nativeShareButton = document.querySelector("#native-share");
 const copyShareButton = document.querySelector("#copy-share");
 const shareAddress = document.querySelector("#share-address");
-const shareScore = document.querySelector("#share-score");
-const shareDimensions = document.querySelector("#share-dimensions");
 const shareQr = document.querySelector("#share-qr");
 const shareLink = document.querySelector("#share-link");
 const shareFeedback = document.querySelector("#share-feedback");
@@ -38,8 +36,7 @@ function loadCatalogue(city) {
   const cityConfig = CITIES[city];
   facilities = [];
   categoryNav.hidden = true;
-  scoreContent.hidden = true;
-  scoreContent.innerHTML = "";
+  shareButton.hidden = true;
   status.textContent = `正在加载${cityConfig.name}地点目录`;
   resultContent.className = "empty-state";
   resultContent.innerHTML = `<h3>正在准备${cityConfig.name}地点</h3><p>目录加载完成后即可搜索地址。</p>`;
@@ -100,10 +97,7 @@ categoryNav.addEventListener("click", (event) => {
   document.querySelector(`#${target.dataset.target}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-scoreContent.addEventListener("click", (event) => {
-  if (!event.target.closest("#open-share")) return;
-  openShareDialog();
-});
+shareButton.addEventListener("click", openShareDialog);
 
 shareCloseButton.addEventListener("click", () => shareDialog.close());
 shareDialog.addEventListener("click", (event) => {
@@ -166,8 +160,7 @@ function setLoading(loading) {
   if (loading) {
     status.textContent = "正在定位并计算各类别最近地点";
     categoryNav.hidden = true;
-    scoreContent.hidden = true;
-    scoreContent.innerHTML = "";
+    shareButton.hidden = true;
     resultContent.className = "loading-state";
     resultContent.innerHTML = "<span></span><span></span><span></span><p>正在查询高德地图</p>";
   }
@@ -298,11 +291,9 @@ function haversineMeters(first, second) {
 
 function renderPlaces(payload) {
   const { origin, groups } = payload;
-  const score = calculateConvenienceScore(groups);
-  latestShare = { address: origin.formattedAddress, score: score.total, dimensions: score.dimensions };
+  latestShare = { address: origin.formattedAddress };
   status.textContent = origin.formattedAddress;
-  scoreContent.hidden = false;
-  scoreContent.innerHTML = renderScoreSummary(score);
+  shareButton.hidden = false;
   categoryNav.hidden = false;
   categoryNav.innerHTML = groups.map((group) => {
     const meta = categoryMeta(group.category);
@@ -315,29 +306,6 @@ function renderPlaces(payload) {
   }).join("");
 }
 
-function calculateConvenienceScore(groups) {
-  const byCategory = new Map(groups.map((group) => [group.category, group.places]));
-  const categoryScore = (category, maximumDistance) => proximityScore(byCategory.get(category) || [], maximumDistance);
-  const groupScore = (categories) => categories.reduce((sum, [category, maximumDistance]) => sum + categoryScore(category, maximumDistance), 0) / categories.length;
-  const dimensions = [
-    { label: "交通", score: groupScore([["transit.metro_station", 2_000], ["transport.railway_station", 8_000], ["transport.airport", 30_000]]) },
-    { label: "医疗", score: groupScore([["medical.tertiary_a", 5_000], ["medical.other", 2_500]]) },
-    { label: "公共文化", score: groupScore([["community.civic_service_center", 2_000], ["library.all", 2_500], ["culture.museum", 4_000], ["culture.art_gallery", 4_000], ["culture.concert_hall", 4_000]]) },
-    { label: "生活商业", score: groupScore([["commerce.big_box_retail", 5_000], ["commerce.large_mall", 5_000]]) },
-    { label: "绿地休闲", score: groupScore([["park.major_city_park", 6_000], ["park.neighborhood_park", 2_000]]) },
-  ].map((dimension) => ({ ...dimension, maximum: 100, score: dimension.score * 100, value: Math.round(dimension.score * 100) }));
-  return { total: Math.round(dimensions.reduce((sum, dimension) => sum + dimension.score, 0) / dimensions.length), dimensions };
-}
-
-function proximityScore(places, maximumDistance) {
-  if (places.length === 0) return 0;
-  return places.reduce((sum, place) => sum + Math.max(0, 1 - place.distanceMeters / maximumDistance), 0) / places.length;
-}
-
-function renderScoreSummary(score) {
-  return `<section class="score-summary" aria-label="综合便利度评分"><div class="score-total"><span>综合便利度</span><strong>${score.total}<small>/ 100</small></strong><button id="open-share" class="share-trigger" type="button">分享</button></div><div class="score-breakdown">${score.dimensions.map((dimension) => `<div><span>${escapeHtml(dimension.label)}</span><strong>${dimension.value} / ${dimension.maximum}</strong></div>`).join("")}</div><p>每组均为 100 分；组内设施和各组均等权，综合分为五组平均。</p></section>`;
-}
-
 function projectUrl() {
   const url = new URL("./", window.location.href);
   url.searchParams.set("city", activeCity);
@@ -345,15 +313,13 @@ function projectUrl() {
 }
 
 function shareText() {
-  return `${latestShare.address}附近设施：综合便利度 ${latestShare.score}/100。`;
+  return `${latestShare.address}附近公共设施结果。`;
 }
 
 function openShareDialog() {
   if (!latestShare) return;
   const url = projectUrl();
   shareAddress.textContent = latestShare.address;
-  shareScore.textContent = latestShare.score;
-  shareDimensions.innerHTML = latestShare.dimensions.map((dimension) => `<span>${escapeHtml(dimension.label)} ${dimension.value}/${dimension.maximum}</span>`).join("");
   shareLink.href = url;
   shareLink.textContent = url.replace(/^https?:\/\//, "");
   shareQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=8&data=${encodeURIComponent(url)}`;
@@ -391,8 +357,7 @@ function renderAlternateNames(place) {
 
 function renderMessage(message, type) {
   categoryNav.hidden = true;
-  scoreContent.hidden = true;
-  scoreContent.innerHTML = "";
+  shareButton.hidden = true;
   status.textContent = type === "error" ? "无法完成定位" : "输入地址后开始检索";
   resultContent.className = `empty-state ${type}`;
   resultContent.innerHTML = `<h3>${escapeHtml(message)}</h3><p>请补充区、路名或门牌号后重试。</p>`;

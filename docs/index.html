@@ -46,11 +46,13 @@
 
       <section class="results" id="results" aria-live="polite" aria-busy="false">
         <div class="result-bar">
-          <h2>最近地点</h2>
+          <div class="result-heading">
+            <h2>最近地点</h2>
+            <button id="open-share" class="share-trigger" type="button" hidden>分享结果</button>
+          </div>
           <p id="status">正在加载地点目录</p>
         </div>
         <div class="results-layout">
-          <div id="score-content" hidden></div>
           <nav id="category-nav" class="category-nav" aria-label="结果类别导航" hidden></nav>
           <div id="result-content" class="empty-state">
             <h3>加载地点目录中</h3>
@@ -67,8 +69,6 @@
         <p id="share-kicker" class="share-kicker">上海公共设施近邻检索</p>
         <h2 id="share-title">附近设施概览</h2>
         <p id="share-address" class="share-address"></p>
-        <p class="share-score"><strong id="share-score">--</strong><span>/ 100 综合便利度</span></p>
-        <div id="share-dimensions" class="share-dimensions" aria-label="评分明细"></div>
         <img id="share-qr" class="share-qr" alt="项目链接二维码" width="180" height="180" />
         <a id="share-link" class="share-link" href="./" target="_blank" rel="noreferrer"></a>
         <div class="share-actions">
