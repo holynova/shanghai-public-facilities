@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#10232e" />
-    <title>近邻 | 上海地点换乘检索</title>
+    <title>近邻 | 城市公共设施检索</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -17,11 +17,15 @@
       <section class="search-deck" aria-labelledby="page-title">
         <div class="search-copy">
           <h1 id="page-title">找附近</h1>
-          <p>输入上海地址，查看每类最近地点。</p>
+          <p>选择城市，输入地址，查看每类最近地点。</p>
+          <div id="city-switch" class="city-switch" role="group" aria-label="选择城市">
+            <button type="button" data-city="shanghai" aria-pressed="true">上海</button>
+            <button type="button" data-city="beijing" aria-pressed="false">北京</button>
+          </div>
         </div>
       </section>
       <form id="address-form" class="address-form" novalidate>
-        <label for="address">上海地址</label>
+          <label for="address">城市地址</label>
         <div class="input-row">
           <input id="address" name="address" autocomplete="street-address" placeholder="例如：人民公园" maxlength="200" required />
           <button type="submit" aria-label="开始查询">
@@ -43,7 +47,7 @@
       <section class="results" id="results" aria-live="polite" aria-busy="false">
         <div class="result-bar">
           <h2>最近地点</h2>
-          <p id="status">正在加载上海地点目录</p>
+          <p id="status">正在加载地点目录</p>
         </div>
         <div class="results-layout">
           <div id="score-content" hidden></div>
@@ -56,11 +60,11 @@
       </section>
     </main>
 
-    <footer>数据目录：GCJ-02 坐标 · 距离为直线距离，仅供出行初筛</footer>
+    <footer id="data-note">数据目录：GCJ-02 坐标 · 距离为直线距离，仅供出行初筛</footer>
     <dialog id="share-dialog" class="share-dialog" aria-labelledby="share-title">
       <article class="share-card">
         <button id="share-close" class="dialog-close" type="button" aria-label="关闭分享卡片">×</button>
-        <p class="share-kicker">上海公共设施近邻检索</p>
+        <p id="share-kicker" class="share-kicker">上海公共设施近邻检索</p>
         <h2 id="share-title">附近设施概览</h2>
         <p id="share-address" class="share-address"></p>
         <p class="share-score"><strong id="share-score">--</strong><span>/ 100 综合便利度</span></p>

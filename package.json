@@ -17,7 +17,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "build:pages": "npm run build --silent && node scripts/export-web-catalogue.mjs",
+    "build:pages": "npm run build --silent && node scripts/export-web-catalogue.mjs --city shanghai",
+    "import:beijing-metro": "node scripts/import-beijing-metro.mjs",
     "cli": "npm run build --silent && node dist/cli.js",
     "web": "npm run build --silent && node dist/web/server.js",
     "check:env": "npm run build --silent && node dist/cli.js check-env",
