@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>近邻｜正在跳转</title>
+    <script>
+      (() => {
+        const legacyPrefix = "/shanghai-public-facilities/";
+        const relativePath = window.location.pathname.startsWith(legacyPrefix)
+          ? window.location.pathname.slice(legacyPrefix.length)
+          : "";
+        const target = new URL(`https://holynova.github.io/city-public-facilities/${relativePath}`);
+        target.search = window.location.search;
+        target.hash = window.location.hash;
+        window.location.replace(target.href);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>正在跳转到新版地址：<a href="https://holynova.github.io/city-public-facilities/">近邻</a></p>
+  </body>
+</html>
