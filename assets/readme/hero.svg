@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="360" viewBox="0 0 1200 360"
+     role="img" aria-labelledby="title desc">
+  <title id="title">近邻旧地址兼容入口 — 旧网址自动跳转到新版</title>
+  <desc id="desc">浅灰蓝底标题：近邻旧地址兼容入口，副标题旧链接不会断，自动带你到新家；右侧是旧地址框经箭头指向新地址框的示意。</desc>
+
+  <rect width="1200" height="360" rx="26" fill="#eef2f6"/>
+
+  <g id="title-block" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <text x="56" y="62" font-size="19" letter-spacing="3" fill="#5a6b7d">旧网址兼容入口 · LEGACY URL REDIRECT</text>
+    <text x="56" y="128" font-size="56" font-weight="700" fill="#1f2a37">近邻旧地址兼容入口</text>
+    <text x="56" y="168" font-size="23" fill="#374a5e">旧链接不会断，自动带你到新家</text>
+    <text x="56" y="204" font-size="19" fill="#5a6b7d">打开旧网址，立即跳转到新版「近邻」，路径与参数原样保留。</text>
+    <g id="chips" font-size="18" fill="#1f2a37" text-anchor="middle">
+      <g><rect x="56" y="238" width="126" height="36" rx="18" fill="#ffffff" stroke="#c3d0dc" stroke-width="1.5"/><text x="119" y="262">即时跳转</text></g>
+      <g><rect x="194" y="238" width="190" height="36" rx="18" fill="#ffffff" stroke="#c3d0dc" stroke-width="1.5"/><text x="289" y="262">保留路径与参数</text></g>
+      <g><rect x="396" y="238" width="150" height="36" rx="18" fill="#ffffff" stroke="#c3d0dc" stroke-width="1.5"/><text x="471" y="262">新版：近邻</text></g>
+    </g>
+  </g>
+
+  <g id="redirect-diagram" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <g id="old-url">
+      <rect x="700" y="72" width="400" height="72" rx="14" fill="#ffffff" stroke="#c3d0dc" stroke-width="2"/>
+      <text x="724" y="100" font-size="18" fill="#5a6b7d">旧地址 OLD</text>
+      <text x="724" y="128" font-size="19" fill="#1f2a37">…/shanghai-public-facilities/…</text>
+    </g>
+    <g id="arrow">
+      <line x1="900" y1="156" x2="900" y2="196" stroke="#2f6db3" stroke-width="4" stroke-linecap="round"/>
+      <polygon points="900,210 884,188 916,188" fill="#2f6db3"/>
+    </g>
+    <g id="new-url">
+      <rect x="700" y="220" width="400" height="72" rx="14" fill="#2f6db3" stroke="#2f6db3" stroke-width="2"/>
+      <text x="724" y="248" font-size="18" fill="#ffffff">新地址 NEW</text>
+      <text x="724" y="276" font-size="19" fill="#ffffff">…/city-public-facilities/…</text>
+    </g>
+  </g>
+</svg>
