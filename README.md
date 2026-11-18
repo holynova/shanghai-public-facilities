@@ -1,3 +1,5 @@
+<p align="right"><a href="README.en.md">English</a></p>
+
 <p align="center">
   <img src="./assets/readme/hero.svg" width="100%" alt="近邻旧地址兼容入口 — 旧地址框经箭头指向新地址框的示意">
 </p>
@@ -12,15 +14,13 @@
 
 这个仓库是「近邻」（城市公共设施查询）旧网址的兼容入口：项目从 `shanghai-public-facilities` 更名为 `city-public-facilities` 后，旧链接不会断——打开旧网址会立即跳转到新版，路径、查询参数与锚点原样保留。
 
-This repository is a legacy-URL compatibility shim for 近邻 (City Public Facilities): after the project was renamed from `shanghai-public-facilities` to `city-public-facilities`, old links keep working — opening an old URL redirects instantly to the new site, preserving the path, query string, and hash.
-
-## 它做什么 / What It Does
+## 它做什么
 
 - **即时跳转**：`index.html` 用 JS 立即跳转（另有 `<meta http-equiv="refresh">` 兜底），目标是 `https://holynova.github.io/city-public-facilities/`。
 - **路径保留**：旧地址 `/shanghai-public-facilities/xxx` 跳转到新地址 `/city-public-facilities/xxx`；`?query` 与 `#hash` 一并带过去。
 - **404 也跳转**：`404.html` 与首页是同一套跳转逻辑，深链接打不开时同样被带到新版对应页面。
 
-## 文件 / Files
+## 文件
 
 ```
 index.html   首页跳转（JS + meta refresh 双保险）
@@ -29,12 +29,3 @@ README.md    本文件
 ```
 
 没有构建步骤，没有依赖。改跳转目标时，两个 HTML 文件里的目标地址要一起改。
-
-## English
-
-**shanghai-public-facilities** is a tiny redirect shim — nothing more. The project moved to [city-public-facilities](https://github.com/holynova/city-public-facilities), and this repo keeps old links alive.
-
-- **Instant redirect**: `index.html` redirects via JavaScript, with a `<meta http-equiv="refresh">` fallback.
-- **Path-preserving**: `/shanghai-public-facilities/xxx` → `/city-public-facilities/xxx`, including query string and hash.
-- **404s redirect too**: `404.html` runs the same logic, so deep links land on the matching new page.
-- **No build, no dependencies**: two HTML files. When the target changes, update the URL in both files.
